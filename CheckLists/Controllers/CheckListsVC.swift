@@ -17,10 +17,44 @@ class CheckListsVC: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        loadChecklistItems()
     }
     
     // MARK: - Helper Functions
+    
+    func documentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
+    }
+    
+    func dataFilePath() -> URL {
+        return documentsDirectory().appendingPathComponent("CheckLists.plist")
+    }
+    
+    func saveCheckListItems() {
+        
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(items)
+            try data.write(to: dataFilePath(), options: Data.WritingOptions.atomic)
+        } catch  {
+            print("Error encoding item array: \(error.localizedDescription)")
+        }
+    }
+    
+    func loadChecklistItems() {
+        let path = dataFilePath()
+        
+        if let data = try? Data(contentsOf: path) {
+            let decoder = PropertyListDecoder()
+            do {
+                items = try decoder.decode([CheckListItem].self, from: data)
+            } catch {
+                print("Error decoding item array: \(error.localizedDescription)")
+            }
+        }
+    }
     
     func configureText(for cell: UITableViewCell, with item: CheckListItem) {
         let label = cell.viewWithTag(1000) as! UILabel
@@ -76,12 +110,14 @@ class CheckListsVC: UITableViewController {
             item.toggleChecked()
             configureCheckmark(for: cell, with: item)
         }
+        saveCheckListItems()
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         items.remove(at: indexPath.row)
         let indexPaths = [indexPath]
+        saveCheckListItems()
         tableView.deleteRows(at: indexPaths, with: .automatic)
     }
 }
@@ -102,6 +138,8 @@ extension CheckListsVC: ItemDetailsVCDelegate {
         let indexPaths = [indexPath]
         tableView.insertRows(at: indexPaths, with: .automatic)
         
+        saveCheckListItems()
+        
         navigationController?.popViewController(animated: true)
     }
     
@@ -113,6 +151,7 @@ extension CheckListsVC: ItemDetailsVCDelegate {
                 configureText(for: cell, with: item)
             }
         }
+        saveCheckListItems()
         navigationController?.popViewController(animated: true)
     }
 }
