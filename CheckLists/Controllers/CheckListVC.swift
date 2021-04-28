@@ -7,16 +7,18 @@
 
 import UIKit
 
-class CheckListsVC: UITableViewController {
+class CheckListVC: UITableViewController {
     
     // MARK: - Properites
     
     var items = [CheckListItem]()
+    var checklist: Checklist!
     
     // MARK: - Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        title = checklist.name
         loadChecklistItems()
     }
     
@@ -124,7 +126,7 @@ class CheckListsVC: UITableViewController {
 
 // MARK: - Item Details VC Delegate
 
-extension CheckListsVC: ItemDetailsVCDelegate {
+extension CheckListVC: ItemDetailsVCDelegate {
     func itemDetailVCDidCancel(_ controller: ItemDetailsVC) {
         navigationController?.popViewController(animated: true)
     }

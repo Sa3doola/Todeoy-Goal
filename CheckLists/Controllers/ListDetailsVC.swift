@@ -1,82 +1,69 @@
 //
-//  ItemDetailsVC.swift
+//  ListDetailsVC.swift
 //  CheckLists
 //
-//  Created by Saad Sherif on 4/26/21.
+//  Created by Saad Sherif on 4/28/21.
 //
 
 import UIKit
 
-protocol ItemDetailsVCDelegate: class {
-    func itemDetailVCDidCancel(_ controller: ItemDetailsVC)
-    func itemDetailVC(_ controller: ItemDetailsVC, didFinishAdding item: CheckListItem)
-    func itemDetailVCDidCancel(_ controller: ItemDetailsVC, didFinishEditing item: CheckListItem)
+protocol ListDetailVCDelegate: class {
+    func listDetailVCDidCancel(_ controller: ListDetailsVC)
+    func listDetailVC(_ controller: ListDetailsVC, didFinishAdding checklist: Checklist)
+    func listDetailVC(_ controller: ListDetailsVC, didFinishEditing checklist: Checklist)
 }
 
-class ItemDetailsVC: UITableViewController {
+class ListDetailsVC: UITableViewController {
+    
+    weak var delegate: ListDetailVCDelegate?
+    var checklistToEdit: Checklist?
 
-    // MARK: - Properites
-    
-    weak var delegate: ItemDetailsVCDelegate?
-    var itemToEdit: CheckListItem?
-    
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var doneBarButton: UIBarButtonItem!
     
-    // MARK: - Life Cycle
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let itemToEdit = itemToEdit {
-            title = "Edit Item"
-            textField.text = itemToEdit.text
+        if let checklist = checklistToEdit {
+            title = "Edit Checklist"
+            textField.text = checklist.name
             doneBarButton.isEnabled = true
         }
-
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         textField.becomeFirstResponder()
     }
-    
-    // MARK: - Helper Functions
-    
-    // MARK: - Selectors
-    
+
     @IBAction func cancelTapped() {
-        delegate?.itemDetailVCDidCancel(self)
+        delegate?.listDetailVCDidCancel(self)
     }
     
     @IBAction func doneTapped() {
-        if let item = itemToEdit {
-            item.text = textField.text!
-            delegate?.itemDetailVCDidCancel(self, didFinishEditing: item)
+        if let checklist = checklistToEdit {
+            checklist.name = textField.text!
+            delegate?.listDetailVC(self, didFinishEditing: checklist)
         } else {
-            let item = CheckListItem()
-            item.text = textField.text!
-            delegate?.itemDetailVC(self, didFinishAdding: item)
+            let checklist = Checklist(name: textField.text!)
+            delegate?.listDetailVC(self, didFinishAdding: checklist)
         }
     }
-
-    // MARK: - Table View Delegate
+    
+    // MARK: - Table view delegate
     
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         return nil
     }
 }
 
-extension ItemDetailsVC: UITextFieldDelegate {
-    
+extension ListDetailsVC: UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        
         let oldText = textField.text!
         let stringRange = Range(range, in: oldText)!
         let newText = oldText.replacingCharacters(in: stringRange, with: string)
         
         doneBarButton.isEnabled = !newText.isEmpty
-        
         return true
     }
     
