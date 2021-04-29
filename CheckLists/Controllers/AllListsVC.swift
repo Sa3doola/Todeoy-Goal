@@ -9,17 +9,31 @@ import UIKit
 
 class AllListsVC: UITableViewController {
     
+    // MARK: - Properties
+    
     let cellIdentifier = "CheckListCell"
     
     var dataModel: DataModel!
 
+    // MARK: - Life Cycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
     }
     
-    // MARK: - Helper Functions
-    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        navigationController?.delegate = self
+        
+        let index = dataModel.indexOfSelectedChecklist
+        
+        if index >= 0 && index < dataModel.lists.count {
+            let checklist = dataModel.lists[index]
+            performSegue(withIdentifier: "ShowChecklist", sender: checklist)
+        }
+    }
 
     // MARK: - Table view data source
 
@@ -40,8 +54,9 @@ class AllListsVC: UITableViewController {
     // MARK: - Table view delegate
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        dataModel.indexOfSelectedChecklist = indexPath.row
         let checklist = dataModel.lists[indexPath.row]
-        performSegue(withIdentifier: "ShowCheckList", sender: checklist)
+        performSegue(withIdentifier: "ShowChecklist", sender: checklist)
     }
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -62,7 +77,7 @@ class AllListsVC: UITableViewController {
     // MARK: - Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "ShowCheckList" {
+        if segue.identifier == "ShowChecklist" {
             let controller = segue.destination as! CheckListVC
             controller.checklist = sender as? Checklist
         } else if segue.identifier == "AddChecklist" {
@@ -71,6 +86,8 @@ class AllListsVC: UITableViewController {
         }
     }
 }
+
+// MARK: - ListDetail View Controller Delegate
 
 extension AllListsVC: ListDetailVCDelegate {
     func listDetailVCDidCancel(_ controller: ListDetailsVC) {
@@ -96,5 +113,16 @@ extension AllListsVC: ListDetailVCDelegate {
             }
         }
         navigationController?.popViewController(animated: true)
+    }
+}
+
+// MARK: - Navigation Controller Delegate
+
+extension AllListsVC: UINavigationControllerDelegate {
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
+        
+        if viewController === self {
+            dataModel.indexOfSelectedChecklist = -1
+        }
     }
 }

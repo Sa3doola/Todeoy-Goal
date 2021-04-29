@@ -29,7 +29,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <segue destination="uVF-cP-2gU" kind="show" identifier="ShowCheckList" id="Asg-Ue-ghC"/>
+                        <segue destination="uVF-cP-2gU" kind="show" identifier="ShowChecklist" id="Asg-Ue-ghC"/>
                         <segue destination="cxk-t6-5B9" kind="show" identifier="EditChecklist" id="MXm-vu-6Zg"/>
                     </connections>
                 </tableViewController>

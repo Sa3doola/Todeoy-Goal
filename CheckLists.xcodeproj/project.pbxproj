@@ -68,11 +68,11 @@
 		D980EB362637341C008D2A04 /* CheckLists */ = {
 			isa = PBXGroup;
 			children = (
-				D980EB5F2637393F008D2A04 /* Resources */,
-				D980EB5E26373938008D2A04 /* Model */,
-				D980EB5C26373928008D2A04 /* View */,
 				D980EB5B2637391F008D2A04 /* Controllers */,
 				D980EB452637341D008D2A04 /* Info.plist */,
+				D980EB5E26373938008D2A04 /* Model */,
+				D980EB5F2637393F008D2A04 /* Resources */,
+				D980EB5C26373928008D2A04 /* View */,
 			);
 			path = CheckLists;
 			sourceTree = "<group>";
